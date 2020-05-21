@@ -5,12 +5,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import static com.acme.mytrader.util.TestUtil.getPriceListeners;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TradingStrategyTest {
@@ -24,9 +25,7 @@ public class TradingStrategyTest {
         when(listener.getSecurity()).thenReturn(SECURITY);
         tradingStrategy.addPriceListener(listener);
 
-        Field priceListeners = tradingStrategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(tradingStrategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(tradingStrategy);
         assertTrue(listeners.containsKey(SECURITY));
         assertNotNull(listeners.get(SECURITY));
         assertEquals(listener, listeners.get(SECURITY).get(0));
@@ -34,9 +33,7 @@ public class TradingStrategyTest {
 
     @Test
     public void shouldRemovePriceListener() throws NoSuchFieldException, IllegalAccessException {
-        Field priceListeners = tradingStrategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(tradingStrategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(tradingStrategy);
         List<PriceListener> listenersList = new ArrayList<>();
         listenersList.add(listener);
         listeners.put(SECURITY, listenersList);
@@ -46,5 +43,32 @@ public class TradingStrategyTest {
 
         assertFalse(listeners.containsKey(SECURITY));
     }
+
+    @Test
+    public void shouldUpdatePriceWhenListerIsAvailable() throws NoSuchFieldException, IllegalAccessException {
+
+        Map<String, List<PriceListener>> listeners = getPriceListeners(tradingStrategy);
+        List<PriceListener> listenersList = new ArrayList<>();
+        listenersList.add(listener);
+        listeners.put(SECURITY, listenersList);
+
+        double price = 55.0;
+        tradingStrategy.executeStrategy(SECURITY, price);
+
+        verify(listener).priceUpdate(SECURITY, price);
+    }
+
+    @Test
+    public void shouldNotUpdatePriceWhenListerIsAvailable() throws NoSuchFieldException, IllegalAccessException {
+        Map<String, List<PriceListener>> listeners = getPriceListeners(tradingStrategy);
+        listeners.clear();
+
+        double price = 55.0;
+        tradingStrategy.executeStrategy(SECURITY, price);
+        verifyZeroInteractions(listener);
+    }
+
+
+
 
 }

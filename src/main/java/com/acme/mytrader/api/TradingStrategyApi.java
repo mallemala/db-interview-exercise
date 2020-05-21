@@ -1,7 +1,6 @@
 package com.acme.mytrader.api;
 
 import com.acme.mytrader.price.PriceListenerFactory;
-import com.acme.mytrader.strategy.Strategy;
 import com.acme.mytrader.strategy.TradingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

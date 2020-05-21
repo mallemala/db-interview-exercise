@@ -15,11 +15,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.acme.mytrader.util.TestUtil.getPriceListeners;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -67,9 +67,7 @@ public class TradingStrategyApiTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Price Listener created successfully"));
 
-        Field priceListeners = strategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(strategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(strategy);
 
         assertTrue(listeners.containsKey(SECURITY));
         assertNotNull(listeners.get(SECURITY));
@@ -121,9 +119,7 @@ public class TradingStrategyApiTest {
     @Test
     public void shouldRemovePriceListener() throws Exception {
 
-        Field priceListeners = strategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(strategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(strategy);
         List<PriceListener> listenersList = new ArrayList<>();
         listenersList.add(priceListener);
         listeners.put(SECURITY, listenersList);
@@ -195,9 +191,7 @@ public class TradingStrategyApiTest {
 
     @Test
     public void shouldCallListenerWhenListenerIsPresentAndAddPriceMovementIsCalled() throws Exception {
-        Field priceListeners = strategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(strategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(strategy);
         List<PriceListener> listenersList = new ArrayList<>();
         listenersList.add(priceListener);
         listeners.put(SECURITY, listenersList);
@@ -214,9 +208,7 @@ public class TradingStrategyApiTest {
 
     @Test
     public void shouldNotCallBuyInstructionWhenPriceMovementDontBreachTriggerLevel() throws Exception {
-        Field priceListeners = strategy.getClass().getDeclaredField("priceListeners");
-        priceListeners.setAccessible(true);
-        Map<String, List<PriceListener>> listeners = (Map<String, List<PriceListener>>) priceListeners.get(strategy);
+        Map<String, List<PriceListener>> listeners = getPriceListeners(strategy);
         List<PriceListener> listenersList = new ArrayList<>();
         listenersList.add(priceListener);
         listeners.put(SECURITY, listenersList);
