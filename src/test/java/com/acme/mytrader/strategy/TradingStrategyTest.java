@@ -59,7 +59,7 @@ public class TradingStrategyTest {
     }
 
     @Test
-    public void shouldNotUpdatePriceWhenListerIsAvailable() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldNotUpdatePriceWhenListerIsNotAvailable() throws NoSuchFieldException, IllegalAccessException {
         Map<String, List<PriceListener>> listeners = getPriceListeners(tradingStrategy);
         listeners.clear();
 
